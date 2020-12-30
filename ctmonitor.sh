@@ -23,4 +23,4 @@ if [ ! -f "$certstream_bin" ]; then
 fi
 
 # Launch the certstream and start looking for the pattern
-$certstream_bin --disable-colors 2>&1 | cut -d " " -f4 | grep -iE "$grep_pattern"
+$certstream_bin --full --disable-colors 2>&1  | cut -d " " -f4- | grep -iE "$grep_pattern"
