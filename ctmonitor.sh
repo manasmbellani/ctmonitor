@@ -43,7 +43,7 @@ fi
 # Count number of iterations of certstream being run
 i=1
 while [ 1 ]; do
-    echo "[*] $(date): Iter $i: Launch certstream & look for pattern: $grep_pattern" > "$logfile"
+    echo "[*] $(date): Iter $i: Launch certstream & look for pattern: $grep_pattern" >> "$logfile"
     unbuffer $certstream_bin --full --disable-colors 2>&1 \
     | grep -vE "INFO:|ERROR:" \
     | cut -d " " -f4- \
@@ -51,10 +51,10 @@ while [ 1 ]; do
     | tee "$outfile"
 
     if [ "$run_continuously" == "1" ]; then
-        echo "[*] $(date): Iter $i: Sleep $DEFAULT_SLEEP_TIMEOUT seconds before restart" > "$logfile"
+        echo "[*] $(date): Iter $i: Sleep $DEFAULT_SLEEP_TIMEOUT seconds before restart" >> "$logfile"
         sleep "$DEFAULT_SLEEP_TIMEOUT"
 
-        echo "[*] $(date): Iter $i: Incrementing iteration" > "$logfile"
+        echo "[*] $(date): Iter $i: Incrementing iteration" >> "$logfile"
         i=$(($i + 1))
     fi
 done
