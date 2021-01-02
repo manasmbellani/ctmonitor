@@ -2,10 +2,11 @@
 Simple script(s) to monitor the SSL certificate transparency logs via ctstream
 
 ## Setup
-Run the following:
+Run the following script which will attempt to install required dependencies:
 ```
-python3 -m pip install -r requirements.txt
+./setup.sh
 ```
+
 
 ## Usage
 Run script without args to see usage information.
