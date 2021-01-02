@@ -28,8 +28,9 @@ if [ ! -f "$certstream_bin" ]; then
     exit 1
 fi
 
-echo "[*] Launch the certstream in background"
-$certstream_bin --full --disable-colors 2>&1 | grep -vE "INFO:|ERROR:" 1>"$outfile" &
-
-echo "[*] Start looking for pattern: $grep_pattern in the certificate"
-unbuffer tail -f "$outfile" | cut -d " " -f4- | grep -iE "$grep_pattern"
+echo "[*] Launch the certstream in background & look for pattern: $grep_pattern"
+unbuffer $certstream_bin --full --disable-colors 2>&1 \
+| grep -vE "INFO:|ERROR:" \
+| cut -d " " -f4- \
+| grep -iE "$grep_pattern" \
+| tee "$outfile"
