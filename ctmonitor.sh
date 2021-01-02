@@ -1,11 +1,14 @@
 #!/bin/bash
+SCRIPT_DIR=$(dirname "$0")
 DEFAULT_CERTSTREAM_BIN="/usr/local/bin/certstream"
-DEFAULT_OUTFILE="out-ct-log.txt"
+DEFAULT_OUTFILE="$SCRIPT_DIR/out-ctmonitor-out.txt"
+DEFAULT_LOGFILE="$SCRIPT_DIR/out-ctmonitor-log.txt"
 DEFAULT_SLEEP_TIMEOUT=3
 DEFAULT_RUN_CONTINUOUS=1
 USAGE="
 [-] $0 <keywords/grep-pattern> [certstream_bin=$DEFAULT_CERTSTREAM_BIN] 
-[outfile=$DEFAULT_OUTFILE] [run_continuously=$DEFAULT_RUN_CONTINUOUS]
+[outfile=$DEFAULT_OUTFILE] [logfile=$DEFAULT_LOGFILE] 
+[run_continuously=$DEFAULT_RUN_CONTINUOUS]
 
 Script will look for any SSL certifications containing specific keywords/grep 
 pattern and write them to output file
@@ -25,17 +28,22 @@ fi
 grep_pattern="$1"
 certstream_bin=${2:-"$DEFAULT_CERTSTREAM_BIN"}
 outfile=${3:-"$DEFAULT_OUTFILE"}
-run_continuously=${4:-"$DEFAULT_RUN_CONTINUOUS"}
+logfile=${4:-"$DEFAULT_LOGFILE"}
+run_continuously=${5:-"$DEFAULT_RUN_CONTINUOUS"}
 
+# Check if certstream binary is on the system
 if [ ! -f "$certstream_bin" ]; then
     echo "[-] Certstream binary not found at location: $certstream_bin"
     exit 1
 fi
 
+# create the logfile, if it doesn't exist
+[ ! -f "$logfile" ] && touch "$logfile"
+
 # Count number of iterations of certstream being run
 i=1
 while [ 1 ]; do
-    echo "[*] Iter $i: Launch certstream & look for pattern: $grep_pattern"
+    echo "[*] $(date): Iter $i: Launch certstream & look for pattern: $grep_pattern" > "$logfile"
     unbuffer $certstream_bin --full --disable-colors 2>&1 \
     | grep -vE "INFO:|ERROR:" \
     | cut -d " " -f4- \
@@ -43,10 +51,10 @@ while [ 1 ]; do
     | tee "$outfile"
 
     if [ "$run_continuously" == "1" ]; then
-        echo "[*] Iter $i: Sleep $DEFAULT_SLEEP_TIMEOUT seconds before restart"
+        echo "[*] $(date): Iter $i: Sleep $DEFAULT_SLEEP_TIMEOUT seconds before restart" > "$logfile"
         sleep "$DEFAULT_SLEEP_TIMEOUT"
 
-        echo "[*] Iter $i: Incrementing iteration"
+        echo "[*] $(date): Iter $i: Incrementing iteration" > "$logfile"
         i=$(($i + 1))
     fi
 done
