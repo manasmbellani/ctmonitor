@@ -1,6 +1,6 @@
 #!/bin/bash
 SCRIPT_DIR=$(dirname "$0")
-DEFAULT_CERTSTREAM_BIN="/usr/local/bin/certstream"
+DEFAULT_CERTSTREAM_BIN="/usr/bin/certstream"
 DEFAULT_OUTFILE="$SCRIPT_DIR/out-ctmonitor-out.txt"
 DEFAULT_LOGFILE="$SCRIPT_DIR/out-ctmonitor-log.txt"
 DEFAULT_SLEEP_TIMEOUT=1
