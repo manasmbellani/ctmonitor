@@ -1,6 +1,7 @@
 #!/bin/bash
 SCRIPT_DIR=$(dirname "$0")
 DEFAULT_CERTSTREAM_BIN="$HOME/go/bin/gocertstream"
+DEFAULT_OUTFILE="$SCRIPT_DIR/out-ctmonitor-out.txt"
 DEFAULT_LOGFILE="$SCRIPT_DIR/out-ctmonitor-log.txt"
 DEFAULT_SLEEP_TIMEOUT=1
 DEFAULT_RUN_CONTINUOUS=1
@@ -25,8 +26,9 @@ if [ $# -lt 1 ]; then
 fi
 grep_pattern="$1"
 certstream_bin=${2:-"$DEFAULT_CERTSTREAM_BIN"}
-logfile=${3:-"$DEFAULT_LOGFILE"}
-run_continuously=${4:-"$DEFAULT_RUN_CONTINUOUS"}
+outfile=${3:-"$DEFAULT_OUTFILE"}
+logfile=${4:-"$DEFAULT_LOGFILE"}
+run_continuously=${5:-"$DEFAULT_RUN_CONTINUOUS"}
 
 # Check if certstream binary is on the system
 if [ ! -f "$certstream_bin" ]; then
@@ -41,7 +43,7 @@ fi
 i=1
 while [ 1 ]; do
     echo "[*] $(date): Iter $i: Launch certstream & look for pattern: $grep_pattern" >> "$logfile"
-    $certstream_bin -regex "$grep_pattern"
+    $certstream_bin -regex "$grep_pattern" | tee "$outfile"
 
     if [ "$run_continuously" == "1" ]; then
         echo "[*] $(date): Iter $i: Sleep $DEFAULT_SLEEP_TIMEOUT seconds before restart" >> "$logfile"
