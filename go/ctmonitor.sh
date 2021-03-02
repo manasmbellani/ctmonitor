@@ -7,7 +7,8 @@ DEFAULT_SLEEP_TIMEOUT=1
 DEFAULT_RUN_CONTINUOUS=1
 USAGE="
 [-] $0 <keywords/grep-pattern> [certstream_bin=$DEFAULT_CERTSTREAM_BIN] 
-[logfile=$DEFAULT_LOGFILE] [run_continuously=$DEFAULT_RUN_CONTINUOUS]
+[outfile=$DEFAULT_OUTFILE] [logfile=$DEFAULT_LOGFILE] 
+[run_continuously=$DEFAULT_RUN_CONTINUOUS]
 
 Script will look for any SSL certifications containing specific keywords/grep 
 pattern and write them to output file
