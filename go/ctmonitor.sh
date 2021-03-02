@@ -1,14 +1,15 @@
 #!/bin/bash
 SCRIPT_DIR=$(dirname "$0")
+DEFAULT_OUTFOLDER="/opt/dockershare/ctmonitor"
 DEFAULT_CERTSTREAM_BIN="$HOME/go/bin/gocertstream"
-DEFAULT_OUTFILE="$SCRIPT_DIR/out-ctmonitor-out.txt"
-DEFAULT_LOGFILE="$SCRIPT_DIR/out-ctmonitor-log.txt"
+DEFAULT_OUTFILE="out-ctmonitor-out.txt"
+DEFAULT_LOGFILE="out-ctmonitor-log.txt"
 DEFAULT_SLEEP_TIMEOUT=1
 DEFAULT_RUN_CONTINUOUS=1
 USAGE="
-[-] $0 <keywords/grep-pattern> [certstream_bin=$DEFAULT_CERTSTREAM_BIN] 
-[outfile=$DEFAULT_OUTFILE] [logfile=$DEFAULT_LOGFILE] 
-[run_continuously=$DEFAULT_RUN_CONTINUOUS]
+[-] $0 <keywords/grep-pattern> [outfolder=$DEFAULT_OUTFOLDER] 
+[outfile=$DEFAULT_OUTFOLDER/$DEFAULT_OUTFILE] [logfile=$DEFAULT_OUTFOLDER/$DEFAULT_LOGFILE] 
+[certstream_bin=$DEFAULT_CERTSTREAM_BIN] [run_continuously=$DEFAULT_RUN_CONTINUOUS]
 
 Script will look for any SSL certifications containing specific keywords/grep 
 pattern and write them to output file
@@ -18,24 +19,30 @@ Example:
     to the default output file at $DEFAULT_OUTFILE
         $0 'webmail|disk'
 
-    To write to the outfile 'out-cert-trans.log' instead
-        $0 'webmail|disk' 'out-cert-trans.log'
+    To write to the outfile 'out-cert-trans.log' instead and use 
+    '~/go/bin/gocertstream' file:
+        $0 'webmail|disk' '/opt/dockershare/ctmonitor' 'out-cert-trans.log' 
+        'out-cert-log.log' '~/go/bin/certstream'
 "
 if [ $# -lt 1 ]; then
     echo "$USAGE"
     exit 1
 fi
 grep_pattern="$1"
-certstream_bin=${2:-"$DEFAULT_CERTSTREAM_BIN"}
-outfile=${3:-"$DEFAULT_OUTFILE"}
-logfile=${4:-"$DEFAULT_LOGFILE"}
-run_continuously=${5:-"$DEFAULT_RUN_CONTINUOUS"}
+outfolder=${2:-"$DEFAULT_OUTFOLDER"}
+outfile=${3:-"$outfolder/$DEFAULT_OUTFILE"}
+logfile=${4:-"$outfolder/$DEFAULT_LOGFILE"}
+certstream_bin=${5:-"$DEFAULT_CERTSTREAM_BIN"}
+run_continuously=${6:-"$DEFAULT_RUN_CONTINUOUS"}
 
 # Check if certstream binary is on the system
 if [ ! -f "$certstream_bin" ]; then
     echo "[-] Certstream Golang binary not found at location: $certstream_bin"
     exit 1
 fi
+
+# Checking if outfolder exists, if not create it
+if [ ! -d "$outfolder" ] && mkdir -p "$outfolder"
 
 # create the logfile, if it doesn't exist
 [ ! -f "$logfile" ] && touch "$logfile"
