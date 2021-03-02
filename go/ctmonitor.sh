@@ -42,7 +42,7 @@ if [ ! -f "$certstream_bin" ]; then
 fi
 
 # Checking if outfolder exists, if not create it
-if [ ! -d "$outfolder" ] && mkdir -p "$outfolder"
+[ ! -d "$outfolder" ] && mkdir -p "$outfolder"
 
 # create the logfile, if it doesn't exist
 [ ! -f "$logfile" ] && touch "$logfile"
