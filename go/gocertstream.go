@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"regexp"
+	"sync"
 
 	"github.com/CaliDog/certstream-go"
 	logging "github.com/op/go-logging"
@@ -19,6 +20,12 @@ func main() {
 	flag.StringVar(&regex, "regex", ".*",
 		"Regular expression to match a CN/SAN")
 	flag.Parse()
+
+	// Maintain the list of certs found to-date here
+	certsFound := make(map[string]string)
+
+	// Make reading/writing thread-safe
+	var lock sync.RWMutex
 
 	// The false flag specifies that we want heartbeat messages.
 	stream, errStream := certstream.CertStreamEventStream(false)
@@ -43,13 +50,27 @@ func main() {
 				log.Error("Error reading subjectAltName for certificate", sanErr)
 			}
 
-			msg := fmt.Sprintf("[%s] %s | %s", NOTFLABEL, cn, san)
+			// Collect certificate details
+			certDetails := fmt.Sprintf("%s | %s", cn, san)
 
 			// Check if certificate detail matches regex
-			matched, _ := regexp.MatchString(regex, msg)
+			matched, _ := regexp.MatchString(regex, certDetails)
 			if matched {
-				// Write the certificate details to STDOUT
-				fmt.Println(msg)
+				lock.RLock()
+				// Verify that certificate has not been previously discovered
+				_, certAlreadyFound := certsFound[certDetails]
+				lock.RUnlock()
+
+				if !certAlreadyFound {
+					lock.Lock()
+					// Add the cert to list of certs already reported
+					certsFound[certDetails] = "1"
+					lock.Unlock()
+
+					// Write the certificate details to STDOUT
+					msg := fmt.Sprintf("[%s] %s", NOTFLABEL, certDetails)
+					fmt.Println(msg)
+				}
 			}
 
 		case err := <-errStream:
