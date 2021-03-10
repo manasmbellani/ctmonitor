@@ -20,11 +20,13 @@ const NOTFLABEL = "ctmonitor"
 // and print cert
 func filterAndPrintCertsWorkers(certs chan string, numThreads int,
 	certsFound map[string]bool, lock *sync.RWMutex, wg *sync.WaitGroup) {
-	for certDetails := range certs {
+	for i := 0; i < numThreads; i++ {
 		wg.Add(1)
-		for i := 0; i < numThreads; i++ {
-			go func() {
-				defer wg.Done()
+
+		// Launch the goroutines to print the certificates
+		go func() {
+			defer wg.Done()
+			for certDetails := range certs {
 
 				lock.RLock()
 				// Verify that certificate has not been previously discovered
@@ -41,8 +43,8 @@ func filterAndPrintCertsWorkers(certs chan string, numThreads int,
 					msg := fmt.Sprintf("[%s] %s", NOTFLABEL, certDetails)
 					fmt.Println(msg)
 				}
-			}()
-		}
+			}
+		}()
 	}
 }
 
