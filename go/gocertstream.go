@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	log2 "log"
 	"regexp"
 	"sync"
 
@@ -95,7 +94,6 @@ func main() {
 			// Check if certificate detail matches regex
 			matched, _ := regexp.MatchString(regex, certDetails)
 			if matched {
-				log2.Println("Added cert to channel, cert: ", certDetails)
 
 				// Pass the certificate details for parsing
 				certs <- certDetails
